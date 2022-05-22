@@ -1,0 +1,8 @@
+{
+	"filename": "AutomaticLaunchCodes.dll",
+	"author": "MegaPiggy",
+	"name": "Automatic Launch Codes",
+	"uniqueName": "MegaPiggy.AutomaticLaunchCodes",
+	"version": "1.0.0",
+	"dependencies": [ "Locochoco.CAMOWA" ]
+}
