@@ -13,6 +13,7 @@ namespace AutomaticLaunchCodes
     [BepInDependency("locochoco.plugins.CAMOWA", BepInDependency.DependencyFlags.HardDependency)]
     [BepInPlugin("MegaPiggy.AutomaticLaunchCodes", "AutomaticLaunchCodes", "1.0.0")]
     [BepInProcess("OuterWilds_Alpha_1_2.exe")]
+    [BepInProcess("OuterWilds_AlphaDemo_PC.exe")]
     public class AutomaticLaunchCodes : BaseUnityPlugin
     {
 
