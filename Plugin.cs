@@ -1,5 +1,5 @@
 ﻿using BepInEx;
-using CAMOWA;
+using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,55 +10,33 @@ using UnityEngine;
 
 namespace AutomaticLaunchCodes
 {
-    [BepInDependency("locochoco.plugins.CAMOWA", BepInDependency.DependencyFlags.HardDependency)]
     [BepInPlugin("MegaPiggy.AutomaticLaunchCodes", "AutomaticLaunchCodes", "1.0.0")]
     [BepInProcess("OuterWilds_Alpha_1_2.exe")]
     [BepInProcess("OuterWilds_AlphaDemo_PC.exe")]
     public class AutomaticLaunchCodes : BaseUnityPlugin
     {
-
-        private static string gamePath;
-        public static string DllExecutablePath
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(gamePath))
-                    gamePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                return gamePath;
-            }
-
-            private set { }
-        }
-
         private void Awake()
         {
-            Debug.Log($"{nameof(AutomaticLaunchCodes)} was started");
-            Debug.Log($"The mod script has been placed in the '{this.gameObject.name}'");
-            SceneLoading.OnSceneLoad += SceneLoading_OnSceneLoad;
+            Logger.LogDebug($"{nameof(AutomaticLaunchCodes)} was started");
+            Logger.LogDebug($"The mod script has been placed in the '{this.gameObject.name}'");
+            new Harmony("MegaPiggy.AutomaticLaunchCodes").PatchAll();
+            Logger.LogDebug($"Harmony patching complete");
+        }
+    }
+
+    [HarmonyPatch(typeof(LaunchTerminal), nameof(LaunchTerminal.Start))]
+    public static class LaunchTerminalPatch
+    {
+        public static void Postfix(LaunchTerminal __instance)
+        {
+            Initialize(__instance);
         }
 
-        private void SceneLoading_OnSceneLoad(int sceneId)
+        public static void Initialize(LaunchTerminal launchTerminal)
         {
-            if (sceneId == 1)
-            {
-                Initialize();
-            }
-        }
-
-        private IEnumerator DelayLaunch()
-        {
-            yield return new WaitForSeconds(1);
+            PlayerData.LearnLaunchCodes();
             GlobalMessenger.FireEvent("ActivateLaunchTower");
-            ((LaunchTerminal)UnityEngine.Object.FindObjectOfType(typeof(LaunchTerminal)))._interactVolume.Disable();
-        }
-
-        private void Initialize()
-        {
-            if (Application.loadedLevel == 1)
-            {
-                PlayerData.LearnLaunchCodes();
-                StartCoroutine(DelayLaunch());
-            }
+            launchTerminal._interactVolume.Disable();
         }
     }
 }
